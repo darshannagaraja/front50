@@ -23,6 +23,7 @@ import com.netflix.spinnaker.front50.model.serviceaccount.ServiceAccount
 import com.netflix.spinnaker.front50.model.serviceaccount.ServiceAccountDAO
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
@@ -51,6 +52,9 @@ public class ServiceAccountsController {
   @Autowired
   FiatPermissionEvaluator fiatPermissionEvaluator
 
+  @Value('${fiat.roleSync.enabled:true}')
+  Boolean roleSync
+
   @RequestMapping(method = RequestMethod.GET)
   Set<ServiceAccount> getAllServiceAccounts() {
     serviceAccountDAO.all();
@@ -76,12 +80,11 @@ public class ServiceAccountsController {
   }
 
   private void syncUsers(ServiceAccount serviceAccount) {
-    if (!fiatClientConfigurationProperties.enabled || !fiatService || !serviceAccount) {
+    if (!fiatClientConfigurationProperties.enabled || !fiatService || !serviceAccount || !roleSync) {
       return
     }
     try {
-      // Empty body to keep OkHttp happy: https://github.com/square/retrofit/issues/854
-      fiatService.sync(new ArrayList<String>())
+      fiatService.sync(serviceAccount.memberOf)
       log.debug("Synced users with roles")
       // Invalidate the current user's permissions in the local cache
       Authentication auth = SecurityContextHolder.getContext().getAuthentication()

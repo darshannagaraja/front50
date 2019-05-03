@@ -49,17 +49,17 @@ public class PipelineTemplate extends HashMap<String, Object> implements Timesta
   }
 
   /**
-   * @return Decorated id with appended digest or version.
+   * @return Decorated id with appended digest or tag.
    */
   @Override
   public String getId() {
     String digest = getDigest();
-    String version = getVersion();
+    String tag = getTag();
     String id = (String) super.get("id");
     if (StringUtils.isNotEmpty(digest)) {
       return String.format("%s@sha256:%s", id, digest);
-    } else if (StringUtils.isNotEmpty(version)) {
-      return String.format("%s:%s", id, version);
+    } else if (StringUtils.isNotEmpty(tag)) {
+      return String.format("%s:%s", id, tag);
     } else {
       return id;
     }
@@ -67,12 +67,12 @@ public class PipelineTemplate extends HashMap<String, Object> implements Timesta
 
   public void setId(String id) { super.put("id", id); }
 
-  public String getVersion() {
-    return (String) super.get("version");
+  public String getTag() {
+    return (String) super.get("tag");
   }
 
-  public void setVersion(String version) {
-    super.put("version", version);
+  public void setTag(String tag) {
+    super.put("tag", tag);
   }
 
   public String getDigest() {
@@ -89,6 +89,15 @@ public class PipelineTemplate extends HashMap<String, Object> implements Timesta
     return (updateTs != null) ? Long.valueOf(updateTs) : null;
   }
 
+  /**
+   * Removes and returns last modified time from the pipeline template.
+   * @return last modified time of the pipeline template.
+   */
+  public Long removeLastModified() {
+    String updateTs = (String) super.remove("updateTs");
+    return (updateTs != null) ? Long.valueOf(updateTs) : null;
+  }
+
   @Override
   public void setLastModified(Long lastModified) {
     super.put("updateTs", lastModified.toString());
@@ -97,6 +106,14 @@ public class PipelineTemplate extends HashMap<String, Object> implements Timesta
   @Override
   public String getLastModifiedBy() {
     return (String) super.get("lastModifiedBy");
+  }
+
+  /**
+   * Removes and returns user that last modified the pipeline template.
+   * @return user last modifying the pipeline template.
+   */
+  public String removeLastModifiedBy() {
+    return (String) super.remove("lastModifiedBy");
   }
 
   @Override

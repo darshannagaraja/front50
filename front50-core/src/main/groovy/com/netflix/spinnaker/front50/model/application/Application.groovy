@@ -125,6 +125,7 @@ class Application implements Timestamped {
     updatedApplication.createTs = this.createTs
     updatedApplication.description = updatedApplication.description ?: this.description
     updatedApplication.email = updatedApplication.email ?: this.email
+    updatedApplication.cloudProviders = updatedApplication.cloudProviders ?: this.cloudProviders
     mergeDetails(updatedApplication, this)
     validate(updatedApplication)
 
@@ -196,6 +197,7 @@ class Application implements Timestamped {
     projectDao.all().findAll {
         it.config.applications.contains(application.toLowerCase())
       }.each {
+        log.info("Removing application {} from project {}", application, it.id)
         it.config.applications.remove(application.toLowerCase())
         it.config.clusters.each { cluster ->
           cluster.applications?.remove(application.toLowerCase())
@@ -213,8 +215,13 @@ class Application implements Timestamped {
   }
 
   private void deletePipelines(String application) {
-    pipelineDao.getPipelinesByApplication(application, true).each { Pipeline p -> pipelineDao.delete(p.id) }
-    pipelineStrategyDao.getPipelinesByApplication(application).each { Pipeline p -> pipelineStrategyDao.delete(p.id) }
+    Collection<Pipeline> pipelinesToDelete = pipelineDao.getPipelinesByApplication(application, true)
+    log.info("Deleting pipelines for application {}: {}", application, pipelinesToDelete.findResults { it.id } )
+    pipelinesToDelete.each { Pipeline p -> pipelineDao.delete(p.id) }
+
+    Collection<Pipeline> strategiesToDelete = pipelineStrategyDao.getPipelinesByApplication(application)
+    log.info("Deleting strategies for application {}: {}", application, strategiesToDelete.findResults { it.id } )
+    strategiesToDelete.each { Pipeline p -> pipelineStrategyDao.delete(p.id) }
   }
 
   Application clear() {

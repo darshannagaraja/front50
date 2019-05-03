@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Microsoft, Inc.
+ * Copyright 2019 Netflix, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-repositories {
-  maven { url "https://adxsnapshots.azurewebsites.net" }
+
+package com.netflix.spinnaker.front50.validator;
+
+import com.netflix.spinnaker.front50.model.pipeline.Pipeline;
+import org.springframework.validation.Errors;
+
+/**
+ * An extension point wherein custom validation can be applied pre-save/update operations.
+ */
+public interface PipelineValidator {
+  /**
+   * @param pipeline the pipeline being modified
+   * @param errors specific validation errors for {@param pipeline}
+   */
+  void validate(Pipeline pipeline, Errors errors);
 }
-
-repositories {
-  maven { url "https://adxsnapshots.azurewebsites.net" }
-}
-
-dependencies {
-  compile project(":front50-core")
-  compile 'com.microsoft.azure:azure:1.0.0-beta3'
-  compile 'com.microsoft.azure:azure-storage:4.4.0'
-  compile 'com.microsoft.azure:azure-mgmt-storage:1.0.0-beta3'
-
-  compile spinnaker.dependency("korkSecurity")
-  testCompile project(":front50-test")
-}
-

@@ -17,7 +17,7 @@
 buildscript {
   repositories {
     jcenter()
-    maven { url "http://dl.bintray.com/spinnaker/gradle" }
+    maven { url "https://dl.bintray.com/spinnaker/gradle" }
     maven { url "https://plugins.gradle.org/m2/" }
   }
   dependencies {
@@ -32,7 +32,7 @@ allprojects { project ->
   group = "com.netflix.spinnaker.front50"
 
   ext {
-    spinnakerDependenciesVersion = '1.30.0'
+    spinnakerDependenciesVersion = '1.43.1'
     if (project.hasProperty('spinnakerDependenciesVersion')) {
       spinnakerDependenciesVersion = project.property('spinnakerDependenciesVersion')
     }
