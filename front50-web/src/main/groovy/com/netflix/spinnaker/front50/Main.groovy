@@ -19,32 +19,40 @@
 package com.netflix.spinnaker.front50
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
-import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
 import org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
 import org.springframework.boot.autoconfigure.groovy.template.GroovyTemplateAutoConfiguration
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+import org.springframework.boot.autoconfigure.gson.GsonAutoConfiguration
 import org.springframework.boot.builder.SpringApplicationBuilder
-import org.springframework.boot.web.support.SpringBootServletInitializer
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.scheduling.annotation.EnableScheduling
 
 @Configuration
 @EnableScheduling
-@EnableAutoConfiguration(exclude = [GroovyTemplateAutoConfiguration, CassandraAutoConfiguration, RedisAutoConfiguration, RedisRepositoriesAutoConfiguration])
+@EnableAutoConfiguration(exclude = [
+  GroovyTemplateAutoConfiguration,
+  RedisAutoConfiguration,
+  RedisRepositoriesAutoConfiguration,
+  DataSourceAutoConfiguration,
+  GsonAutoConfiguration
+])
 @ComponentScan(["com.netflix.spinnaker.front50", "com.netflix.spinnaker.config"])
 public class Main extends SpringBootServletInitializer {
   static final Map<String, String> DEFAULT_PROPS = [
     'netflix.environment'    : 'test',
     'netflix.account'        : '${netflix.environment}',
     'netflix.stack'          : 'test',
-    'spring.config.location' : '${user.home}/.spinnaker/',
+    'spring.config.additional-location' : '${user.home}/.spinnaker/',
     'spring.application.name': 'front50',
     'spring.config.name'     : 'spinnaker,${spring.application.name}',
     'spring.profiles.active' : '${netflix.environment},local'
   ]
 
   static void main(String... args) {
+    System.setProperty("spring.main.allow-bean-definition-overriding", "true")
     new SpringApplicationBuilder().properties(DEFAULT_PROPS).sources(Main).run(args)
   }
 
